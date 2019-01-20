@@ -1,0 +1,5 @@
+#!/usr/bin/with-contenv bash
+
+# copy config
+[[ ! -f /config/settings.json ]] && cp \
+	/defaults/settings.sh /config/settings.sh

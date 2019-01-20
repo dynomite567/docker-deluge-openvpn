@@ -1,0 +1,3 @@
+#!/usr/bin/with-contenv bash
+
+exec tail -F -n0 /config/deluged.log 2> /dev/null
