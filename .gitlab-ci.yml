@@ -1,7 +1,8 @@
 build-arm:
   image: docker:latest
   stage: build
-  tags: dockerarmhf
+  tags: 
+    - dockerarmhf
   services:
     - docker:dind
   before_script:
@@ -15,7 +16,8 @@ build-arm:
 build-amd64:
   image: docker:latest
   stage: build
-  tags: docker
+  tags: 
+    - docker
   services:
     - docker:dind
   before_script:
