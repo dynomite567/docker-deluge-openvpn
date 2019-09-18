@@ -1,0 +1,27 @@
+build-arm:
+  image: docker:latest
+  stage: build
+  tags: dockerarmhf
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_LOGIN" -p "$DOCKER_PASS"
+    - apk add dos2unix
+  script:
+    - dos2unix *
+    - docker build -t "$DOCKER_IMAGE" .
+    - docker push "$DOCKER_IMAGE"
+
+build-amd64:
+  image: docker:latest
+  stage: build
+  tags: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login -u "$DOCKER_LOGIN" -p "$DOCKER_PASS"
+    - apk add dos2unix
+  script:
+    - dos2unix *
+    - docker build -t "$DOCKER_IMAGE" .
+    - docker push "$DOCKER_IMAGE"
