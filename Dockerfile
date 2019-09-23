@@ -1,5 +1,5 @@
 FROM linuxserver/deluge:ed2b9165-ls6
-LABEL maintainer="Matthew Crenshaw"
+LABEL maintainer="DynomiteCentral"
 
 VOLUME /config
 VOLUME /downloads
