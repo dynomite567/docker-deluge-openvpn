@@ -1,3 +1,5 @@
+sudo: true
+
 env:
   matrix:
     secure: jiei1mm9GQhglXarfOkj4tYB/An7f4w2MNiH1T5HG7Tx2PkYpHnILy70XzqNz+a7xvEysbRA+cAH+W5ZAokrj6e/63E8VmG4tQMdeNgR39Fkx9yJtxrdaQy757/UA10or+sYMvzIxLkxdYwo+ZFPg6YGRen94JxUtVCAK1iA3s76fRG5rmqRzbeXJe94Y1fp9XHKcvxTm68pFJCJJFnG2gTPpk3WrX6T/1MKrqcltti07lak6ddkC+RbrmqP3mmsyOgmY23tNIrh0f8uL+T/wmA7f00UIT8rGTSFw5GxdfpdkuhDJM341ilQKgLKIONVaib/axHuNRTn/C3tNpnfmXF4rGVu8WQCmr3wnjLWTYY8WsBFl6IRtJdmW+3eFRwwy18X8hjpjFkD0uCKdVKBwNmETfDc4oOBck4jSmfZlhDv+K1u1dRYRAVAgeyR7ryutqYoFryHwr8fgOGwyyhbbbnfAPVsOfVfS2fw/dJFB0oaMypyxJHJZs11LVA62sA7Q6MSemX3CUeT3yjHresmYAtjgKYPrFUIYeMia38ShGbKvg8pBWXh4ivgT+5AneGs9FkShIDQOOYBHbi0E8YbsmJ+uKuxVjASXfS+NdMXHvfV0+0aH5dRoSg2IM54jxm4TOwTM1SvgLiVJF4l7TBY6uuocgbjtj8NQmSDr5im6to=
@@ -21,3 +23,6 @@ jobs:
     - stage: build and publish image
       script:
       - bash ./.build.sh
+
+notifications:
+  email: false
