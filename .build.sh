@@ -1,7 +1,7 @@
 #!/bin/sh
 echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-archarchitectures="arm arm64 amd64"
+architectures="arm arm64 amd64"
 platforms=""
 images=""
 
