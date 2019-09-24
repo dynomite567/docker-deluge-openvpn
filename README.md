@@ -3,6 +3,7 @@
 [![Docker Automated build](https://img.shields.io/docker/automated/sgtsquiggs/deluge-openvpn.svg)](https://hub.docker.com/r/sgtsquiggs/deluge-openvpn/)
 [![Docker Pulls](https://img.shields.io/docker/pulls/sgtsquiggs/deluge-openvpn.svg)](https://hub.docker.com/r/sgtsquiggs/deluge-openvpn/)
 
+**Cloned from [sgtsquiggs/docker-deluge-openvpn](https://github.com/sgtsquiggs/docker-deluge-openvpn)**
 
 This container contains OpenVPN and Deluge with a configuration
 where Deluge is running only when OpenVPN has an active tunnel.
