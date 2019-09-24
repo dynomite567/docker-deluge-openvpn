@@ -20,17 +20,4 @@ buildctl build --frontend dockerfile.v0 \
         --exporter-opt name=docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:latest \
         --exporter-opt push=true \
         --frontend-opt platform=$platforms \
-        --frontend-opt filename=./Dockerfile 
-
-for arch in $architectures
-do
-# Build for all architectures and push manifest
-  buildctl build --frontend dockerfile.v0 \
-      --local dockerfile=. \
-      --local context=. \
-      --exporter image \
-      --exporter-opt name=docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:latest \
-      --exporter-opt push=true \
-      --frontend-opt platform=linux/$arch \
-      --frontend-opt filename=./Dockerfile &
-done
+        --frontend-opt filename=./Dockerfile.cross
