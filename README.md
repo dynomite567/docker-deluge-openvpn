@@ -1,6 +1,6 @@
 # OpenVPN and Deluge with WebUI
 
-[![Docker Automated build](https://img.shields.io/docker/automated/sgtsquiggs/deluge-openvpn.svg)](https://hub.docker.com/r/sgtsquiggs/deluge-openvpn/)
+[![Build Status](https://travis-ci.com/dynomite567/docker-deluge-openvpn.svg?branch=master)](https://travis-ci.com/dynomite567/docker-deluge-openvpn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/sgtsquiggs/deluge-openvpn.svg)](https://hub.docker.com/r/sgtsquiggs/deluge-openvpn/)
 
 **Cloned from [sgtsquiggs/docker-deluge-openvpn](https://github.com/sgtsquiggs/docker-deluge-openvpn)**
@@ -33,7 +33,7 @@ $ docker run --cap-add=NET_ADMIN --device=/dev/net/tun -d \
               -e OPENVPN_PASSWORD=pass \
               -e LOCAL_NETWORK=192.168.0.0/16 \
               -p 8112:8112 \
-              sgtsquiggs/deluge-openvpn
+              dynomitecentral/deluge-openvpn
 ```
 
 You must set the environment variables `OPENVPN_PROVIDER`, `OPENVPN_USERNAME` and `OPENVPN_PASSWORD` to provide basic connection details.
@@ -168,7 +168,7 @@ $ docker run --cap-add=NET_ADMIN --device=/dev/net/tun -d \
               -v /etc/localtime:/etc/localtime:ro \
               --env-file /your/docker/env/file \
               -p 9091:9091 \
-              haugene/transmission-openvpn
+              dynomitecentral/deluge-openvpn
 ```
 
 ## Access the WebUI
