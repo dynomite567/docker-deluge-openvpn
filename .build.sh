@@ -1,9 +1,9 @@
 #!/bin/sh
-echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
 
 architectures="arm arm64 amd64"
-platforms=""
 images=""
+platforms=""
 
 for arch in $architectures
 do
@@ -13,6 +13,7 @@ done
 
 platforms=${platforms::-1}
 
+
 buildctl build --frontend dockerfile.v0 \
         --local dockerfile=. \
         --local context=. \
@@ -20,4 +21,4 @@ buildctl build --frontend dockerfile.v0 \
         --exporter-opt name=docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:latest \
         --exporter-opt push=true \
         --frontend-opt platform=$platforms \
-        --frontend-opt filename=./Dockerfile.cross
+        --frontend-opt filename=./Dockerfile
