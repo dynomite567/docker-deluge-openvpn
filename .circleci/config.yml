@@ -34,7 +34,7 @@ jobs:
       - run:
           name: Build and push image
           command: |
-            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USER --password-stdin
             bash ./.build.sh
   "buildarm":
     docker:
@@ -71,7 +71,7 @@ jobs:
       - run:
           name: Build and push image
           command: |
-            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            echo "$DOCKER_PASSWORD" | docker login --username $DOCKER_USER --password-stdin
             bash ./.buildarm.sh
 workflows:
   version: 2
