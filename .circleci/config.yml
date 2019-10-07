@@ -1,34 +1,23 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: ubuntu:xenial
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - run:
           name: Install dependencies
           command: |
-            apt update && apt install git ssh curl -y
+            sudo apt update && sudo apt install git ssh curl -y
 
       - checkout
-
-      - setup_remote_docker
-
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="19.03.2"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
 
       - run:
           name: Prepare build enviorment
           command: |
-            docker run --privileged linuxkit/binfmt:v0.6
-            docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-            docker cp buildkit:/usr/bin/buildctl /usr/bin/
+            sudo docker run --privileged linuxkit/binfmt:v0.6
+            sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
+            sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
             export BUILDKIT_HOST=tcp://0.0.0.0:1234
 
       - run:
@@ -36,37 +25,25 @@ jobs:
           command: |
             bash ./.build.sh
   "buildarm":
-    docker:
-      - image: ubuntu:xenial
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - run:
           name: Install dependencies
           command: |
-            apt update && apt install git ssh curl -y
+            sudo apt update && sudo apt install git ssh curl -y
 
       - checkout
-
-      - setup_remote_docker:
-          docker_layer_caching: true
-
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="19.03.2"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
 
       - run:
           name: Prepare build enviorment
           command: |
-            docker run --privileged linuxkit/binfmt:v0.6
-            docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-            docker cp buildkit:/usr/bin/buildctl /usr/bin/
+            sudo docker run --privileged linuxkit/binfmt:v0.6
+            sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
+            sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
             export BUILDKIT_HOST=tcp://0.0.0.0:1234
-
+            
       - run:
           name: Build and push image
           command: |
