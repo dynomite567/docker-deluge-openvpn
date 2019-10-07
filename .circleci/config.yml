@@ -73,7 +73,7 @@ workflows:
           filters:
               branches:
                 only:
-                  - circle-ci-testing
+                  - master
     jobs:
       - build
       - buildarm
