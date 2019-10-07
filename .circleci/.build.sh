@@ -13,10 +13,10 @@ platforms=${platforms::-1}
 
 
 buildctl build --frontend dockerfile.v0 \
-        --local dockerfile=.. \
-        --local context=.. \
+        --local dockerfile=. \
+        --local context=. \
         --exporter image \
         --exporter-opt name=docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:latest \
         --exporter-opt push=true \
         --frontend-opt platform=$platforms \
-        --frontend-opt filename=../Dockerfile
+        --frontend-opt filename=./Dockerfile
