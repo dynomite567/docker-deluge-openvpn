@@ -1,5 +1,5 @@
 #!/bin/sh
-docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
 architectures="arm"
 images=""
