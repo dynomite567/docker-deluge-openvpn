@@ -1,4 +1,6 @@
 #!/bin/sh
+docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+
 architectures="arm"
 images=""
 platforms=""
