@@ -1,6 +1,6 @@
 # OpenVPN and Deluge with WebUI
 
-[![Build Status](https://travis-ci.com/dynomite567/docker-deluge-openvpn.svg?branch=master)](https://travis-ci.com/dynomite567/docker-deluge-openvpn)
+[![CircleCI](https://circleci.com/gh/dynomite567/docker-deluge-openvpn.svg?style=svg)](https://circleci.com/gh/dynomite567/docker-deluge-openvpn)
 [![Docker Pulls](https://img.shields.io/docker/pulls/sgtsquiggs/deluge-openvpn.svg)](https://hub.docker.com/r/sgtsquiggs/deluge-openvpn/)
 
 **Cloned from [sgtsquiggs/docker-deluge-openvpn](https://github.com/sgtsquiggs/docker-deluge-openvpn)**
