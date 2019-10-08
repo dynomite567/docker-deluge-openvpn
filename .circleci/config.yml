@@ -9,10 +9,16 @@ jobs:
           name: Install and update dependencies
           command: |
             sudo apt update && sudo apt install git ssh curl -y
+            
       - run:
           name: Enabling experimental features on Docker
           command: |
-            sudo sh -c 'echo '\''DOCKER_OPTS="--experimental=true"'\'' >> /etc/default/docker'
+            mkdir ~/.docker
+            sudo cat <<EOF > ~/.docker/config.json
+            {
+                    "experimental": "enabled"
+            }
+            EOF
             sudo service docker restart
 
       - checkout
@@ -27,10 +33,15 @@ jobs:
             done
 
       - run:
-          name: Build images
+          name: Build amd64 image
           command: |
             docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
+
+      - run:
+          name: Build arm32v6 image
+          command: |
             docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
+
       - run:
           name: Combine and publish image
           command : |
