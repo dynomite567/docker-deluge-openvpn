@@ -1,78 +1,48 @@
 version: 2
 jobs:
   build:
-    docker:
-      - image: ubuntu:xenial
+    machine:
+      image: ubuntu-1604:201903-01
 
     steps:
       - run:
-          name: Install dependencies
+          name: Install and update dependencies
           command: |
             apt update && apt install git ssh curl -y
+      - run:
+          name: Enabling experimental features on Docker
+          command: |
+            sudo sh -c 'echo '\''DOCKER_OPTS="--experimental=true"'\'' >> /etc/default/docker'
+            sudo service docker restart
 
       - checkout
-
-      - setup_remote_docker
-
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="19.03.2"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
-
-      - run:
-          name: Build and push image
-          command: |
-            docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:latest
-            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
-            docker push $DOCKER_USER/$DOCKER_IMAGE:latest
-  "buildarm":
-    docker:
-      - image: ubuntu:xenial
-
-    steps:
-      - run:
-          name: Install dependencies
-          command: |
-            apt update && apt install git ssh curl -y
-
-      - checkout
-
-      - setup_remote_docker
-
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="19.03.2"
-            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
 
       - run:
           name: Prepare build enviorment
           command: |
             docker run --rm --privileged multiarch/qemu-user-static:register
-            for target_arch in arm; do
+            for target_arch in arm amd64; do
               wget -N https://github.com/multiarch/qemu-user-static/releases/download/v4.1.0-1/x86_64_qemu-${target_arch}-static.tar.gz
               tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
             done
 
       - run:
-          name: Build and push image
+          name: Build images
           command: |
-            docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:latest
+            docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
+            docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
+      - run:
+          name: Combine and publish image
+          command : |
+            docker manifest create $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:amd64-latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
+            docker manifest annotate $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest --os linux --arch arm
             docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
-            docker push $DOCKER_USER/$DOCKER_IMAGE:latest
+            docker manifest push $DOCKER_USER/$DOCKER_IMAGE:latest
 workflows:
   version: 2
   commit:
     jobs:
       - build
-      - "buildarm"
   weekly:
     triggers:
       - schedule:
@@ -83,4 +53,3 @@ workflows:
                   - master
     jobs:
       - build
-      - "buildarm"
