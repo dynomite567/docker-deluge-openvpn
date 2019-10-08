@@ -41,6 +41,7 @@ jobs:
           name: Build arm32v6 image
           command: |
             docker build -f Dockerfile.armhf -t docker.io/$DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
+            docker image ls -a
 
       - run:
           name: Combine and publish image
