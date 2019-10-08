@@ -35,20 +35,24 @@ jobs:
       - run:
           name: Build amd64 image
           command: |
-            docker build -f Dockerfile -t docker.io/$DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
+            docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
 
       - run:
           name: Build arm32v6 image
           command: |
-            docker build -f Dockerfile.armhf -t docker.io/$DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
-            docker image ls -a
+            docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
 
       - run:
-          name: Combine and publish image
+          name: Publish images
           command : |
+            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+            docker push $DOCKER_USER/$DOCKER_IMAGE:amd64-latest
+            docker push $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
+      - run:
+          name: Create manifest image
+          command: |
             docker manifest create $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:amd64-latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
             docker manifest annotate $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest --os linux --arch arm
-            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
             docker manifest push $DOCKER_USER/$DOCKER_IMAGE:latest
 workflows:
   version: 2
