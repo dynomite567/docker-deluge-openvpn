@@ -18,7 +18,7 @@ buildctl build --frontend dockerfile.v0 \
         --local dockerfile=. \
         --local context=. \
         --exporter image \
-        --exporter-opt name=docker.io/$DOCKER_USERNAME/$DOCKER_IMAGE:latest \
+        --exporter-opt name=docker.io/$DOCKER_USER/$DOCKER_IMAGE:latest \
         --exporter-opt push=true \
         --frontend-opt platform=$platforms \
         --frontend-opt filename=./Dockerfile
