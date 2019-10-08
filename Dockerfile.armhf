@@ -1,4 +1,4 @@
-FROM linuxserver/deluge:ed2b9165-ls6
+FROM arm32v6/linuxserver/deluge:arm64v8-ed2b9165-ls6
 LABEL maintainer="DynomiteCentral"
 
 COPY qemu-arm-static /usr/bin/
