@@ -1,53 +1,72 @@
 version: 2
 jobs:
   build:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: ubuntu:xenial
 
     steps:
       - run:
           name: Install dependencies
           command: |
-            sudo apt update && sudo apt install git ssh curl -y
+            apt update && apt install git ssh curl -y
 
       - checkout
 
+      - setup_remote_docker
+
       - run:
-          name: Prepare build enviorment
+          name: Install Docker client
           command: |
-            sudo docker run --privileged linuxkit/binfmt:v0.6
-            sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-            sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
-            export BUILDKIT_HOST=tcp://0.0.0.0:1234
+            set -x
+            VER="19.03.2"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
 
       - run:
           name: Build and push image
           command: |
-            bash ./.build.sh
+            docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:latest
+            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+            docker push $DOCKER_USER/$DOCKER_IMAGE:latest
   "buildarm":
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: ubuntu:xenial
 
     steps:
       - run:
           name: Install dependencies
           command: |
-            sudo apt update && sudo apt install git ssh curl -y
+            apt update && apt install git ssh curl -y
 
       - checkout
+
+      - setup_remote_docker
+
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="19.03.2"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
 
       - run:
           name: Prepare build enviorment
           command: |
-            sudo docker run --privileged linuxkit/binfmt:v0.6
-            sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-            sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
-            export BUILDKIT_HOST=tcp://0.0.0.0:1234
-            
+            docker run --rm --privileged multiarch/qemu-user-static:register
+            for target_arch in arm; do
+              wget -N https://github.com/multiarch/qemu-user-static/releases/download/v4.1.0-1/x86_64_qemu-${target_arch}-static.tar.gz
+              tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
+            done
+
       - run:
           name: Build and push image
           command: |
-            bash ./.buildarm.sh
+            docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:latest
+            docker login --username $DOCKER_USER --password $DOCKER_PASSWORD
+            docker push $DOCKER_USER/$DOCKER_IMAGE:latest
 workflows:
   version: 2
   commit:
