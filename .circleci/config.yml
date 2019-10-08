@@ -8,7 +8,7 @@ jobs:
       - run:
           name: Install and update dependencies
           command: |
-            sudo apt update && apt install git ssh curl -y
+            sudo apt update && sudo apt install git ssh curl -y
       - run:
           name: Enabling experimental features on Docker
           command: |
