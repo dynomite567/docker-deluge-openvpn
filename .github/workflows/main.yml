@@ -8,13 +8,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Setup experimental features
+      run: |
+        mkdir ~/.docker
+            sudo cat <<EOF > ~/.docker/config.json
+            {
+                    "experimental": "enabled"
+            }
+            EOF
+            sudo service docker restart
     - uses: actions/checkout@v1
-    - name: Pre-requisites
+    - name: Prepare build enviorment
       run: |
-        sudo docker run --privileged linuxkit/binfmt:v0.6
-        sudo docker run -d --privileged -p 1234:1234 --name buildkit moby/buildkit:latest --addr tcp://0.0.0.0:1234 --oci-worker-platform linux/amd64 --oci-worker-platform linux/armhf
-        sudo docker cp buildkit:/usr/bin/buildctl /usr/bin/
-        export BUILDKIT_HOST=tcp://0.0.0.0:1234
-    - name: Building and pushing ARM and AMD64 images
+        sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
+        for target_arch in arm; do
+          wget -N https://github.com/multiarch/qemu-user-static/releases/download/v4.1.0-1/x86_64_qemu-${target_arch}-static.tar.gz
+          tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
+        done
+    - name: Build amd64 image
+      run: docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
+    - name: Build arm32v6 image
+      run: docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
+    - name: Publish images
       run: |
-        bash ./.build.sh
+        docker login --username $DOCKER_USER --password $DOCKER_PASS
+        docker push $DOCKER_USER/$DOCKER_IMAGE:amd64-latest
+        docker push $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
+    - name: Creating manifest image
+      run: |
+        docker manifest create $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:amd64-latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
+        docker manifest annotate $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest --os linux --arch arm
+        docker manifest push $DOCKER_USER/$DOCKER_IMAGE:latest
