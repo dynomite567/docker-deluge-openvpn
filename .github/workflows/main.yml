@@ -26,16 +26,16 @@ jobs:
           tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
         done
     - name: Build amd64 image
-      run: docker build -f Dockerfile -t $DOCKER_USER/$DOCKER_IMAGE:amd64-latest .
+      run: docker build -f Dockerfile -t ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest .
     - name: Build arm32v6 image
-      run: docker build -f Dockerfile.armhf -t $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest .
+      run: docker build -f Dockerfile.armhf -t ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest .
     - name: Publish images
       run: |
-        docker login --username $DOCKER_USER --password $DOCKER_PASS
-        docker push $DOCKER_USER/$DOCKER_IMAGE:amd64-latest
-        docker push $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
+        docker login --username ${{ secrets.DOCKER_USER }} --password ${{ secrets.DOCKER_PASS }}
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest
     - name: Creating manifest image
       run: |
-        docker manifest create $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:amd64-latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest
-        docker manifest annotate $DOCKER_USER/$DOCKER_IMAGE:latest $DOCKER_USER/$DOCKER_IMAGE:arm32v6-latest --os linux --arch arm
-        docker manifest push $DOCKER_USER/$DOCKER_IMAGE:latest
+        docker manifest create ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest
+        docker manifest annotate ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest --os linux --arch arm
+        docker manifest push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest
