@@ -1,0 +1,43 @@
+name: weekly-build
+
+on: 
+  schedule:
+    - cron: 0 16 * * 0
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup experimental features
+      run: |
+        mkdir ~/.docker
+            sudo cat <<EOF > ~/.docker/config.json
+            {
+                    "experimental": "enabled"
+            }
+            EOF
+            sudo service docker restart
+    - uses: actions/checkout@v1
+    - name: Prepare build enviorment
+      run: |
+        sudo docker run --rm --privileged multiarch/qemu-user-static:register --reset
+        for target_arch in arm; do
+          wget -N https://github.com/multiarch/qemu-user-static/releases/download/v4.1.0-1/x86_64_qemu-${target_arch}-static.tar.gz
+          tar -xvf x86_64_qemu-${target_arch}-static.tar.gz
+        done
+    - name: Build amd64 image
+      run: docker build -f Dockerfile -t ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest .
+    - name: Build arm32v6 image
+      run: docker build -f Dockerfile.armhf -t ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest .
+    - name: Publish images
+      run: |
+        docker login --username ${{ secrets.DOCKER_USER }} --password ${{ secrets.DOCKER_PASS }}
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest
+        docker push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest
+    - name: Creating manifest image
+      run: |
+        docker manifest create ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:amd64-latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest
+        docker manifest annotate ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:arm32v6-latest --os linux --arch arm
+        docker manifest push ${{ secrets.DOCKER_USER }}/${{ secrets.DOCKER_IMAGE }}:latest
